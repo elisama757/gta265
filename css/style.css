@@ -1,0 +1,254 @@
+/* Estilos principais do jogo */
+
+/* Overlay UI */
+#ui-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: white;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    text-shadow: 2px 2px 2px rgba(0,0,0,0.5);
+    z-index: 100;
+}
+
+#ui-overlay > div {
+    margin-bottom: 5px;
+    background: rgba(0,0,0,0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Controles Mobile */
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 100;
+    display: none; /* Visível apenas em mobile */
+}
+
+.joystick-area {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.joystick-base {
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.joystick-thumb {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    transition: transform 0.1s;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.action-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.8);
+    background: linear-gradient(145deg, rgba(30, 30, 30, 0.9), rgba(50, 50, 50, 0.9));
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.1s;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    backdrop-filter: blur(5px);
+}
+
+.action-btn:active {
+    background: linear-gradient(145deg, rgba(50, 50, 50, 0.9), rgba(70, 70, 70, 0.9));
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Menus */
+.menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(145deg, rgba(0, 0, 0, 0.9), rgba(20, 20, 30, 0.9));
+    color: white;
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    min-width: 320px;
+    border: 2px solid #00a8ff;
+    box-shadow: 0 0 30px rgba(0, 168, 255, 0.3);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.menu h1, .menu h2 {
+    color: #00a8ff;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 0 0 15px rgba(0, 168, 255, 0.5);
+    letter-spacing: 2px;
+}
+
+.menu button {
+    display: block;
+    width: 100%;
+    margin: 15px 0;
+    padding: 15px;
+    background: linear-gradient(to bottom, #00a8ff, #0097e6);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.menu button:hover {
+    background: linear-gradient(to bottom, #0097e6, #0088cc);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 168, 255, 0.4);
+}
+
+.menu button:active {
+    transform: translateY(0);
+}
+
+.instructions {
+    margin-top: 30px;
+    color: #aaa;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.controls-list {
+    text-align: left;
+    margin: 30px 0;
+}
+
+.controls-list div {
+    margin: 10px 0;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border-left: 3px solid #00a8ff;
+}
+
+.controls-list span {
+    color: #00a8ff;
+    font-weight: bold;
+    margin-right: 15px;
+    display: inline-block;
+    width: 80px;
+}
+
+/* Pause Menu */
+#pause-menu {
+    display: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Hit Marker */
+.hit-marker {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    border: 3px solid #ff0000;
+    border-radius: 50%;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+    box-shadow: 0 0 20px #ff0000;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    #mobile-controls {
+        display: flex;
+    }
+    
+    .menu {
+        width: 90%;
+        min-width: auto;
+        padding: 25px;
+    }
+    
+    .menu h1 {
+        font-size: 2em;
+    }
+    
+    .joystick-area {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .action-btn {
+        width: 60px;
+        height: 60px;
+        font-size: 11px;
+    }
+    
+    .controls-list span {
+        width: 60px;
+    }
+}
+
+@media (max-height: 600px) {
+    .menu {
+        padding: 20px;
+    }
+    
+    .menu h1 {
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+    
+    .menu button {
+        padding: 12px;
+        margin: 10px 0;
+    }
+}
+
+/* Animações */
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.7; }
+    100% { opacity: 0.3; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
