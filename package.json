@@ -1,0 +1,16 @@
+{
+  "name": "gtashooter-web",
+  "version": "1.0.0",
+  "description": "Mini jogo 3D estilo GTA para navegador",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'Abra index.html diretamente no navegador'",
+    "build": "echo 'Projeto estático - não requer build'",
+    "deploy": "echo 'Faça upload para Vercel'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": ["threejs", "webgl", "game", "3d", "gta", "shooter"],
+  "author": "Desenvolvedor Three.js",
+  "license": "MIT"
+}
