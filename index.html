@@ -6,12 +6,21 @@
     <title>GTAShooter - Mini GTA Web</title>
     
     <!-- CSS -->
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="css/style.css">
     
-    <!-- Three.js e dependências via CDN -->
+    <!-- Three.js completo com todos os módulos incluídos -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js"></script>
+    
+    <!-- Módulos extras como ES Modules (corrigido) -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.module.js",
+            "three/examples/jsm/controls/OrbitControls": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js",
+            "three/examples/jsm/loaders/GLTFLoader": "https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js"
+        }
+    }
+    </script>
     
     <style>
         /* CSS crítico inline para carregamento rápido */
@@ -106,31 +115,98 @@
         </div>
     </div>
     
-    <!-- Scripts do jogo -->
-    <script>
-        // Garante que THREE está disponível globalmente
-        if (typeof THREE === 'undefined') {
-            document.getElementById('loading-text').textContent = 'Erro: THREE.js não carregou. Recarregue a página.';
-            throw new Error('THREE.js não carregou');
+    <!-- Scripts do jogo - AGORA como módulos -->
+    <script type="module">
+        // Verifica se THREE está disponível
+        function checkThreeJS() {
+            if (typeof THREE === 'undefined') {
+                document.getElementById('loading-text').textContent = 'Erro: THREE.js não carregou. Recarregue a página.';
+                throw new Error('THREE.js não carregou');
+            }
+            return true;
         }
-    </script>
-    
-    <!-- Carrega scripts do jogo em ordem -->
-    <script src="/js/UI.js"></script>
-    <script src="/js/Controls.js"></script>
-    <script src="/js/Target.js"></script>
-    <script src="/js/Player.js"></script>
-    <script src="/js/Game.js"></script>
-    <script src="/js/main.js"></script>
-    
-    <script>
-        // Esconde loading screen quando tudo carregar
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                document.getElementById('loading-screen').style.display = 'none';
-                document.getElementById('game-container').style.display = 'block';
-            }, 500);
+        
+        // Aguarda o carregamento
+        window.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Verifica THREE.js
+                if (!checkThreeJS()) return;
+                
+                // Carrega os módulos extras dinamicamente
+                await loadThreeJSModules();
+                
+                // Importa e inicializa o jogo
+                await import('./js/Game.js');
+                await import('./js/Player.js');
+                await import('./js/Target.js');
+                await import('./js/Controls.js');
+                await import('./js/UI.js');
+                
+                // Inicializa o jogo
+                const game = new Game();
+                window.game = game;
+                
+                // Esconde loading e mostra jogo
+                setTimeout(function() {
+                    document.getElementById('loading-screen').style.display = 'none';
+                    document.getElementById('game-container').style.display = 'block';
+                    
+                    // Configura botões
+                    setupMenuButtons(game);
+                }, 500);
+                
+            } catch (error) {
+                console.error('Erro ao carregar o jogo:', error);
+                document.getElementById('loading-text').textContent = 'Erro ao carregar: ' + error.message;
+            }
         });
+        
+        async function loadThreeJSModules() {
+            // Carrega módulos se necessário (já estamos usando importmap)
+            return true;
+        }
+        
+        function setupMenuButtons(game) {
+            const startBtn = document.getElementById('start-btn');
+            const controlsBtn = document.getElementById('controls-btn');
+            const backBtn = document.getElementById('back-btn');
+            
+            if (startBtn) {
+                startBtn.addEventListener('click', function() {
+                    game.start();
+                    document.getElementById('start-menu').classList.add('hidden');
+                });
+            }
+            
+            if (controlsBtn) {
+                controlsBtn.addEventListener('click', function() {
+                    document.getElementById('start-menu').classList.add('hidden');
+                    document.getElementById('controls-menu').classList.remove('hidden');
+                });
+            }
+            
+            if (backBtn) {
+                backBtn.addEventListener('click', function() {
+                    document.getElementById('controls-menu').classList.add('hidden');
+                    document.getElementById('start-menu').classList.remove('hidden');
+                });
+            }
+            
+            // Detecta mobile
+            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                const mobileControls = document.getElementById('mobile-controls');
+                if (mobileControls) {
+                    mobileControls.style.display = 'flex';
+                }
+            }
+            
+            // ESC para pausar
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && window.game) {
+                    window.game.togglePause();
+                }
+            });
+        }
     </script>
 </body>
 </html>
