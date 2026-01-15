@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GTAShooter - Mini GTA Web</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    
+    <!-- Three.js e dependências via CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.162.0/examples/jsm/loaders/GLTFLoader.js"></script>
+    
+    <style>
+        /* CSS crítico inline para carregamento rápido */
+        * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; user-select: none; }
+        body { overflow: hidden; background: #111; font-family: 'Arial', sans-serif; }
+        canvas { display: block; width: 100%; height: 100%; }
+        #game-container { position: relative; width: 100vw; height: 100vh; }
+        
+        /* Loader inicial */
+        #loading-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: #111;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+        }
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #333;
+            border-top: 5px solid #00a8ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de carregamento -->
+    <div id="loading-screen">
+        <div class="loader"></div>
+        <div id="loading-text">Carregando GTAShooter...</div>
+    </div>
+    
+    <!-- Container principal do jogo -->
+    <div id="game-container" style="display: none;">
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- Overlay de UI -->
+        <div id="ui-overlay">
+            <div id="fps-counter">FPS: 60</div>
+            <div id="score">Pontos: 0</div>
+            <div id="health">Vida: 100%</div>
+        </div>
+        
+        <!-- Controles mobile -->
+        <div id="mobile-controls">
+            <div class="joystick-area" id="movement-joystick">
+                <div class="joystick-base"></div>
+                <div class="joystick-thumb"></div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn" id="aim-btn">Mirar</button>
+                <button class="action-btn" id="shoot-btn">Atirar</button>
+                <button class="action-btn" id="jump-btn">Pular</button>
+            </div>
+        </div>
+        
+        <!-- Menu inicial -->
+        <div id="start-menu" class="menu">
+            <h1>GTASHOOTER 3D</h1>
+            <button id="start-btn">INICIAR JOGO</button>
+            <button id="controls-btn">CONTROLES</button>
+            <div class="instructions">
+                <p>Use WASD para mover, Mouse para mirar, CLICK para atirar</p>
+                <p style="margin-top: 10px; font-size: 12px; color: #888;">Ou use os controles touch no mobile</p>
+            </div>
+        </div>
+        
+        <!-- Menu de controles -->
+        <div id="controls-menu" class="menu hidden">
+            <h2>CONTROLES</h2>
+            <div class="controls-list">
+                <div><span>WASD</span> - Mover</div>
+                <div><span>Mouse</span> - Mirar/Camera</div>
+                <div><span>Clique</span> - Atirar</div>
+                <div><span>Espaço</span> - Pular</div>
+                <div><span>Shift</span> - Correr</div>
+                <div><span>ESC</span> - Pausar</div>
+            </div>
+            <button id="back-btn">VOLTAR</button>
+        </div>
+    </div>
+    
+    <!-- Scripts do jogo -->
+    <script>
+        // Garante que THREE está disponível globalmente
+        if (typeof THREE === 'undefined') {
+            document.getElementById('loading-text').textContent = 'Erro: THREE.js não carregou. Recarregue a página.';
+            throw new Error('THREE.js não carregou');
+        }
+    </script>
+    
+    <!-- Carrega scripts do jogo em ordem -->
+    <script src="/js/UI.js"></script>
+    <script src="/js/Controls.js"></script>
+    <script src="/js/Target.js"></script>
+    <script src="/js/Player.js"></script>
+    <script src="/js/Game.js"></script>
+    <script src="/js/main.js"></script>
+    
+    <script>
+        // Esconde loading screen quando tudo carregar
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('game-container').style.display = 'block';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
