@@ -1,4 +1,4 @@
-// Classe principal do jogo
+// Classe principal do jogo - VERSÃO SIMPLIFICADA PARA VERCEL
 
 class Game {
     constructor() {
@@ -13,7 +13,6 @@ class Game {
         this.score = 0;
         this.gameStarted = false;
         this.isPaused = false;
-        this.orbitControls = null;
         this.ui = null;
         this.gameControls = null;
         
@@ -24,6 +23,11 @@ class Game {
         console.log('Inicializando jogo...');
         
         try {
+            // Verifica se THREE está disponível
+            if (typeof THREE === 'undefined') {
+                throw new Error('THREE.js não está disponível');
+            }
+            
             // Configuração básica da cena
             this.scene = new THREE.Scene();
             this.scene.fog = new THREE.Fog(0x87CEEB, 10, 150);
@@ -310,6 +314,11 @@ class Game {
             }
         });
         
+        // Atualiza controles
+        if (this.gameControls && this.gameControls.update) {
+            this.gameControls.update();
+        }
+        
         // Atualiza UI
         if (this.ui) {
             const fps = deltaTime > 0 ? Math.round(1 / deltaTime) : 0;
@@ -318,7 +327,7 @@ class Game {
             
             // Atualiza vida do jogador (simulado)
             if (this.player) {
-                this.ui.updateHealth(100);
+                this.ui.updateHealth(this.player.health || 100);
             }
         }
     }
@@ -368,19 +377,24 @@ class Game {
         
         // Feedback de score
         console.log(`Score: +${points} (Total: ${this.score})`);
+        
+        // Mostra mensagem para grandes pontuações
+        if (points >= 100) {
+            this.ui.showMessage(`+${points} pontos!`, 1500);
+        }
     }
     
-    // Método para debug
+    // Método para debug (opcional)
     enableDebugMode() {
-        if (this.orbitControls) return;
-        
-        this.orbitControls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.orbitControls.enableDamping = true;
-        this.orbitControls.dampingFactor = 0.05;
-        
-        console.log('Modo debug ativado (OrbitControls)');
+        console.warn('Modo debug não disponível (OrbitControls removido)');
+        console.log('Para debug, use:');
+        console.log('- game.camera.position:', this.camera.position);
+        console.log('- game.player.position:', this.player?.mesh?.position);
+        console.log('- Targets:', this.targets.length);
     }
 }
 
 // Torna a classe disponível globalmente
-window.Game = Game;
+if (typeof window !== 'undefined') {
+    window.Game = Game;
+}
