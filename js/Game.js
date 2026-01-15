@@ -257,40 +257,35 @@ class Game {
         }
     }
     
-    start() {
-        if (this.gameStarted) return;
-        
-        this.gameStarted = true;
-        this.isPaused = false;
+start() {
+    if (this.gameStarted) {
+        console.log('Jogo já iniciado');
+        return;
+    }
+    
+    console.log('Iniciando jogo...');
+    
+    this.gameStarted = true;
+    this.isPaused = false;
+    
+    if (this.gameControls) {
         this.gameControls.activate();
+        console.log('Controles ativados');
+    }
+    
+    if (this.ui) {
         this.ui.showGameUI();
-        
-        console.log('Jogo iniciado!');
+        console.log('UI mostrada');
     }
     
-    pause() {
-        if (!this.gameStarted || this.isPaused) return;
-        
-        this.isPaused = true;
-        this.ui.showPauseMenu();
-    }
+    console.log('Jogo iniciado com sucesso!');
     
-    resume() {
-        if (!this.isPaused) return;
-        
-        this.isPaused = false;
-        this.ui.hidePauseMenu();
-    }
-    
-    togglePause() {
-        if (!this.gameStarted) return;
-        
-        if (this.isPaused) {
-            this.resume();
-        } else {
-            this.pause();
-        }
-    }
+    // Debug: verifica se tudo está funcionando
+    console.log('Player:', this.player ? 'OK' : 'FALTA');
+    console.log('Targets:', this.targets.length);
+    console.log('Camera:', this.camera ? 'OK' : 'FALTA');
+    console.log('Scene:', this.scene ? 'OK' : 'FALTA');
+}
     
     update(deltaTime) {
         if (!this.gameStarted || this.isPaused) return;
