@@ -31,6 +31,10 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -39,16 +43,16 @@
         <div id="loading-text">Carregando GTAShooter...</div>
     </div>
     
-    <div id="game-container" style="display: none;">
+    <div id="game-container" class="hidden">
         <canvas id="game-canvas"></canvas>
         
-        <div id="ui-overlay">
+        <div id="ui-overlay" class="hidden">
             <div id="fps-counter">FPS: 60</div>
             <div id="score">Pontos: 0</div>
             <div id="health">Vida: 100%</div>
         </div>
         
-        <div id="mobile-controls">
+        <div id="mobile-controls" class="hidden">
             <div class="joystick-area" id="movement-joystick">
                 <div class="joystick-base"></div>
                 <div class="joystick-thumb"></div>
@@ -83,83 +87,161 @@
             </div>
             <button id="back-btn">VOLTAR</button>
         </div>
+        
+        <!-- Menu de pausa será criado dinamicamente -->
     </div>
     
-    <!-- Scripts do jogo - Carregamento simplificado -->
+    <!-- Scripts do jogo -->
+    <script src="js/UI.js"></script>
+    <script src="js/Controls.js"></script>
+    <script src="js/Target.js"></script>
+    <script src="js/Player.js"></script>
+    <script src="js/Game.js"></script>
+    
+    <!-- Script principal - DEVE SER O ÚLTIMO -->
     <script>
-        // Espera THREE.js carregar
-        function waitForThreeJS(callback, maxAttempts = 10, interval = 200) {
-            let attempts = 0;
+        // Variável global para o jogo
+        window.game = null;
+        
+        // Aguarda tudo carregar
+        window.addEventListener('load', function() {
+            console.log('Página carregada, verificando THREE.js...');
             
-            function check() {
-                attempts++;
-                if (typeof THREE !== 'undefined') {
-                    callback(true);
-                } else if (attempts < maxAttempts) {
-                    setTimeout(check, interval);
-                } else {
-                    callback(false);
+            // Verifica se THREE.js carregou
+            function checkThreeJS() {
+                if (typeof THREE === 'undefined') {
+                    console.error('THREE.js não carregou!');
+                    document.getElementById('loading-text').textContent = 
+                        'Erro: THREE.js não carregou. Recarregue a página.';
+                    return false;
+                }
+                return true;
+            }
+            
+            // Inicializa o jogo
+            function initGame() {
+                if (!checkThreeJS()) return;
+                
+                console.log('THREE.js carregado, iniciando jogo...');
+                
+                try {
+                    // Cria instância do jogo
+                    window.game = new Game();
+                    
+                    // Configura botões do menu
+                    setupMenuButtons();
+                    
+                    // Esconde loading e mostra menu
+                    setTimeout(function() {
+                        document.getElementById('loading-screen').classList.add('hidden');
+                        document.getElementById('game-container').classList.remove('hidden');
+                        console.log('Jogo pronto!');
+                    }, 500);
+                    
+                } catch (error) {
+                    console.error('Erro ao iniciar jogo:', error);
+                    document.getElementById('loading-text').textContent = 
+                        'Erro: ' + error.message;
                 }
             }
             
-            setTimeout(check, 100);
-        }
-        
-        // Carrega scripts sequencialmente
-        function loadScript(src, callback) {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = () => callback(null);
-            script.onerror = () => callback(new Error(`Falha ao carregar ${src}`));
-            document.body.appendChild(script);
-        }
-        
-        // Inicialização principal
-        window.addEventListener('DOMContentLoaded', function() {
-            waitForThreeJS(function(success) {
-                if (!success) {
-                    document.getElementById('loading-text').textContent = 
-                        'Erro: THREE.js não carregou. Recarregue a página.';
-                    return;
-                }
+            // Configura botões do menu
+            function setupMenuButtons() {
+                const startBtn = document.getElementById('start-btn');
+                const controlsBtn = document.getElementById('controls-btn');
+                const backBtn = document.getElementById('back-btn');
                 
-                // THREE.js carregou com sucesso, carrega os scripts do jogo
-                const scripts = [
-                    'js/UI.js',
-                    'js/Controls.js',
-                    'js/Target.js',
-                    'js/Player.js',
-                    'js/Game.js',
-                    'js/main.js'
-                ];
-                
-                let current = 0;
-                
-                function loadNext() {
-                    if (current >= scripts.length) {
-                        // Todos scripts carregados
-                        document.getElementById('loading-text').textContent = 'Jogo carregado!';
-                        setTimeout(function() {
-                            document.getElementById('loading-screen').style.display = 'none';
-                            document.getElementById('game-container').style.display = 'block';
-                        }, 500);
-                        return;
-                    }
-                    
-                    document.getElementById('loading-text').textContent = 
-                        `Carregando... (${current + 1}/${scripts.length})`;
-                    
-                    loadScript(scripts[current], function(error) {
-                        if (error) {
-                            console.error(error);
+                if (startBtn) {
+                    startBtn.addEventListener('click', function() {
+                        console.log('Botão iniciar clicado');
+                        if (window.game) {
+                            window.game.start();
+                            document.getElementById('start-menu').classList.add('hidden');
+                            
+                            // Mostra UI do jogo
+                            document.getElementById('ui-overlay').classList.remove('hidden');
+                            
+                            // Mostra controles mobile se for mobile
+                            if ('ontouchstart' in window || navigator.maxTouchPoints > 0) {
+                                document.getElementById('mobile-controls').classList.remove('hidden');
+                            }
+                            
+                            // Foca no canvas para capturar teclado
+                            document.getElementById('game-canvas').focus();
+                        } else {
+                            console.error('Jogo não inicializado!');
                         }
-                        current++;
-                        loadNext();
                     });
                 }
                 
-                loadNext();
-            });
+                if (controlsBtn) {
+                    controlsBtn.addEventListener('click', function() {
+                        document.getElementById('start-menu').classList.add('hidden');
+                        document.getElementById('controls-menu').classList.remove('hidden');
+                    });
+                }
+                
+                if (backBtn) {
+                    backBtn.addEventListener('click', function() {
+                        document.getElementById('controls-menu').classList.add('hidden');
+                        document.getElementById('start-menu').classList.remove('hidden');
+                    });
+                }
+                
+                // Configura botões mobile
+                setupMobileButtons();
+                
+                // ESC para pausar
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && window.game) {
+                        window.game.togglePause();
+                    }
+                });
+            }
+            
+            // Configura botões mobile
+            function setupMobileButtons() {
+                const shootBtn = document.getElementById('shoot-btn');
+                const aimBtn = document.getElementById('aim-btn');
+                const jumpBtn = document.getElementById('jump-btn');
+                
+                if (shootBtn) {
+                    shootBtn.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        if (window.game && window.game.player && window.game.gameStarted) {
+                            window.game.player.shoot();
+                        }
+                    });
+                }
+                
+                if (jumpBtn) {
+                    jumpBtn.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        if (window.game && window.game.player && window.game.gameStarted) {
+                            window.game.player.jump();
+                        }
+                    });
+                }
+                
+                if (aimBtn) {
+                    aimBtn.addEventListener('touchstart', function(e) {
+                        e.preventDefault();
+                        if (window.game && window.game.gameControls) {
+                            window.game.gameControls.keys.aim = true;
+                        }
+                    });
+                    
+                    aimBtn.addEventListener('touchend', function(e) {
+                        e.preventDefault();
+                        if (window.game && window.game.gameControls) {
+                            window.game.gameControls.keys.aim = false;
+                        }
+                    });
+                }
+            }
+            
+            // Inicia o jogo
+            initGame();
         });
     </script>
 </body>
